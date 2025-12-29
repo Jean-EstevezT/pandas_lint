@@ -8,8 +8,12 @@ version = "0.1.0"
 description = "Static linter to optimize Pandas/Numpy code"
 dependencies = [
     "click",
-    "rich"
+    "rich",
+    "toml"
 ]
 
 [project.scripts]
 pandas-lint = "pandas_lint.cli:main"
+
+[tool.pandas-linter]
+ignore = ["STY001"]
