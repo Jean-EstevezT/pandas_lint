@@ -108,6 +108,22 @@ class PandasVisitor(ast.NodeVisitor):
                     message="Are you saving intermediate data? 'to_parquet' is much faster and lighter than 'to_csv'.",
                     severity='INFO'
                 ))
+            
+            # Check fr SQL Injection
+            elif node.func.attr in ['read_sql', 'read_sql_query']:
+                if node.args:
+                    sql_arg = node.args[0]
+                    is_fstring = isinstance(sql_arg, ast.JoinedStr)
+                    is_concat = isinstance(sql_arg, ast.BinOp) and isinstance(sql_arg.op, (ast.Add, ast.Mod))
+                    
+                    if is_fstring or is_concat:
+                         self.add_issue(Issue(
+                            line=node.lineno,
+                            col=node.col_offset,
+                            code='SEC001',
+                            message="Potential SQL Injection detected. Use 'params' argument for dynamic queries instead of f-strings or concatenation.",
+                            severity='CRITICAL'
+                        ))
     
         if any(kw.arg == 'inplace' and isinstance(kw.value, ast.Constant) and kw.value.value is True for kw in node.keywords):
              self.add_issue(Issue(

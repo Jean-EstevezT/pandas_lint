@@ -1,0 +1,6 @@
+- id: pandas-lint
+  name: Pandas Linter
+  entry: pandas-lint
+  language: python
+  types: [python]
+  require_serial: true

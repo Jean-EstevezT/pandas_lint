@@ -7,14 +7,15 @@ from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.syntax import Syntax
 from .analyzer import PandasVisitor
 from .notebook import parse_notebook
+from .fixer import fix_code
 import concurrent.futures
 
 console = Console()
 
 def analyze_file(file_path):
     """
-    Analyzes a single file and returns a list of issues.
-    This function must be top-level to be picklable for multiprocessing.
+    Analyzes a single file and returns a list of issues
+    This function must b top-level to be picklable for multiprocessing
     """
     issues = []
     cell_mapping = None
@@ -41,10 +42,11 @@ def analyze_file(file_path):
 
 @click.command()
 @click.argument('path', type=click.Path(exists=True))
-def main(path):
+@click.option('--fix', is_flag=True, help="Automatically fix fixable issues (experimental).")
+def main(path, fix):
     """
-    Pandas-Linter: Static analyzer to optimize Data Science code.
-    PATH can be a .py file or a directory.
+    Pandas-Linter: Static analyzer t optimize Data Science code
+    PATH can be a .py file or a directory
     """
     files_to_check = []
     
@@ -55,6 +57,30 @@ def main(path):
                     files_to_check.append(os.path.join(root, file))
     else:
         files_to_check.append(path)
+
+    if fix:
+        console.print("[bold blue]Running Auto-Fixer...[/bold blue]")
+        import libcst
+        fixed_count = 0
+        for file_path in files_to_check:
+            if file_path.endswith(".ipynb"):
+                continue
+            
+            try:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    original_code = f.read()
+                
+                new_code = fix_code(original_code)
+                
+                if new_code != original_code:
+                    with open(file_path, "w", encoding="utf-8") as f:
+                        f.write(new_code)
+                    console.print(f"Fixed: {file_path}", style="green")
+                    fixed_count += 1
+            except Exception as e:
+                console.print(f"Failed to fix {file_path}: {e}", style="red")
+        
+        console.print(f"[bold green]Auto-fixed {fixed_count} files.[/bold green]\n")
 
     total_issues = 0
     
