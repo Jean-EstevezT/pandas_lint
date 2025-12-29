@@ -38,7 +38,7 @@ class PandasVisitor(ast.NodeVisitor):
                     except TypeError:
                         f.seek(0)
                         import toml
-                        data = toml.load(f.read().decode('utf-8'))
+                        data = toml.loads(f.read().decode('utf-8'))
                 else: 
                      return []
 
