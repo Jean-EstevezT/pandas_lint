@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pandas-linter"
+version = "0.1.0"
+description = "Static linter to optimize Pandas/Numpy code"
+dependencies = [
+    "click",
+    "rich"
+]
+
+[project.scripts]
+pandas-lint = "pandas_lint.cli:main"
