@@ -42,10 +42,11 @@ def analyze_file(file_path):
 
 @click.command()
 @click.argument('path', type=click.Path(exists=True))
+@click.version_option(version='0.1.0')
 @click.option('--fix', is_flag=True, help="Automatically fix fixable issues (experimental).")
 def main(path, fix):
     """
-    Pandas-Linter: Static analyzer t optimize Data Science code
+    Pandas-Linter: Static analyzer to optimize Data Science code
     PATH can be a .py file or a directory
     """
     files_to_check = []
@@ -109,6 +110,7 @@ def main(path, fix):
 def print_report(file_path, issues, cell_mapping=None, file_content_lines=None):
     table = Table(title=f"Analyzing: {file_path}")
 
+    table.add_column("Rule", style="green")
     table.add_column("Line", justify="right", style="cyan", no_wrap=True)
     table.add_column("Code", style="magenta", overflow="fold")
     table.add_column("Severity", style="bold")
@@ -128,8 +130,9 @@ def print_report(file_path, issues, cell_mapping=None, file_content_lines=None):
             code_snippet = syntax
 
         table.add_row(
+            issue.code,
             line_display,
-            code_snippet if code_snippet else issue.code,
+            code_snippet if code_snippet else "",
             f"[{severity_style}]{issue.severity}[/{severity_style}]",
             issue.message
         )
