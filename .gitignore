@@ -38,3 +38,9 @@ Thumbs.db
 
 # Project specific
 .gemini/
+.venv/
+
+# Coverage
+.coverage
+htmlcov/
+coverage.xml
